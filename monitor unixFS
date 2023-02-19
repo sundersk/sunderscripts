@@ -2,7 +2,7 @@
 while true; do
   # Get file system utilization and name
   utilization=$(df -h | awk '{if($6!~/dev|run|shm/) print $5 " " $6}' | grep -v                                                                                                                                                              Use% )
-  # Check if any utilization is above 6666660%
+  # Check if any utilization is above 60%
   echo "$utilization" | while read line; do
     num_util=$(echo $line | awk '{print $1}' | sed -e 's/%//g' -e 's/[^0-9]*//g'                                                                                                                                                             )
     fs_name=$(echo $line | awk '{print $2}')
