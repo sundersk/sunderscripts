@@ -1,15 +1,15 @@
 #!/bin/bash
 while true; do
   # Get file system utilization and name
-  utilization=$(df -h | awk '{if($6!~/dev|run|shm/) print $5 " " $6}' | grep -v                                                                                                                                                              Use% )
+  utilization=$(df -h | awk '{if($6!~/dev|run|shm/) print $5 " " $6}' | grep -v Use% )
   # Check if any utilization is above 60%
   echo "$utilization" | while read line; do
-    num_util=$(echo $line | awk '{print $1}' | sed -e 's/%//g' -e 's/[^0-9]*//g'                                                                                                                                                             )
+    num_util=$(echo $line | awk '{print $1}' | sed -e 's/%//g' -e 's/[^0-9]*//g')
     fs_name=$(echo $line | awk '{print $2}')
     if [ "$num_util" -ge 60 ]; then
       server_name=$(hostname)
-      echo "$(date +"%Y-%m-%d %T") : File system $fs_name on server $server_name                                                                                                                                                              utilization is above 90%. Current utilization: $num_util%" >> /tmp/fslogfile.lo                                                                                                                                                             g
-      echo "File system $fs_name on server $server_name utilization is above 90%                                                                                                                                                             . Current utilization: $num_util%" | mail -s "File System Alert" email@example.c                                                                                                                                                             om
+      echo "$(date +"%Y-%m-%d %T") : File system $fs_name on server $server_name utilization is above 90%. Current utilization: $num_util%" >> /tmp/fslogfile.log
+      echo "File system $fs_name on server $server_name utilization is above 90%. Current utilization: $num_util%" | mail -s "File System Alert" email@example.com
     fi
   done
   sleep 60
