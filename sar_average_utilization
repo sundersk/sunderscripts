@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Define the directory where the sar files are located
+sar_dir="/var/log/sa"
+
+# Define the output file name
+output_file="sar_stats.txt"
+
+# Get a list of all available sar files
+sar_files=$(ls $sar_dir/sa* 2>/dev/null)
+
+# Exit if no sar files are found
+if [ -z "$sar_files" ]; then
+    echo "No sar files found in $sar_dir"
+    exit 1
+fi
+
+# Loop through all available sar files
+for sar_file in $sar_files; do
+    # Extract the date from the sar file name
+    date=$(basename "$sar_file" | sed -E 's/^sa([[:digit:]]{8}).*/\1/' | date +%F)
+
+    # Get the average CPU utilization for the entire day
+    cpu_util=$(sar -f $sar_file | grep -E 'Average.*all' | awk '{print $NF}')
+
+    # Get the average memory utilization for the entire day
+    mem_util=$(sar -r -f $sar_file | grep -E 'Average.*mem' | awk '{print $NF}')
+
+    # Print the results to the console
+    echo "Date: $date"
+    echo "Average CPU utilization: $cpu_util%"
+    echo "Average memory utilization: $mem_util%"
+
+    # Append the results to the output file
+    echo "$date $cpu_util $mem_util" >> $output_file
+done
