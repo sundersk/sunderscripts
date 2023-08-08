@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Set the email address where you want to receive notifications
+EMAIL="your_email@example.com"
+
+# Get the maximum number of semaphores allowed
+MAX_SEMAPHORES=$(cat /proc/sys/kernel/sem | awk '{print $1}')
+
+# Calculate the threshold for 80% full semaphore
+THRESHOLD=$((MAX_SEMAPHORES * 80 / 100))
+
+# Log file
+LOG_FILE="/tmp/semaphore_monitor.log"
+
+# Run the monitoring loop
+while true; do
+    # Get the current semaphore usage for Apache
+    CURRENT_SEMAPHORES=$(ipcs -s | grep apache | wc -l)
+
+    # Check if semaphore usage is high
+    if [ $CURRENT_SEMAPHORES -ge $THRESHOLD ]; then
+        TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+        MESSAGE="[$TIMESTAMP] Semaphore usage for Apache has reached 80% or more.\nCurrent Semaphores: $CURRENT_SEMAPHORES\nMaximum Semaphores: $MAX_SEMAPHORES\n"
+        echo -e "$MESSAGE" >> "$LOG_FILE"
+
+        # Send an email notification using sendmail
+        SUBJECT="Semaphore Alert on $(hostname)"
+        echo -e "$MESSAGE" | /usr/sbin/sendmail "$EMAIL" -s "$SUBJECT"
+    fi
+
+    # Sleep for 24 hours before checking again
+    sleep 86400  # 24 hours in seconds
+done
