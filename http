@@ -1,0 +1,26 @@
+#!/bin/bash
+
+function criticalError {
+
+        awk '$4=="<"&&$9=="H500"&&$(10)=="303"{e=1;next;}$1~/\[/&&/resuming normal operations/{e=e?-1:0}END{exit e>0?1:0; }' /var/log/httpd/error_log
+}
+
+function getSample {
+
+        wget --timeout=20 --tries=5 --retry-connrefused -qO /dev/null 'http://spgdss-prod1-tag-11.maxtrad.rbsgrp.net:646/dss/doc/?g&j=80551000000032219&a=test1&s=test1abc'
+}
+
+function restartDSS {
+
+        [[ -f /var/lock/subsys/httpd ]] || return 0
+
+        echo "Error: $*" >&2
+
+        /sbin/service httpd restart
+        exit
+}
+
+[[ -f /var/lock/subsys/httpd ]] || exit 0
+
+criticalError || restartDSS "(303) Can not recognize date format"
+getSample     || restartDSS "Cannot get sample content"
