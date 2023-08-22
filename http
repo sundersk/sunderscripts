@@ -1,4 +1,4 @@
-#!/bin/bash
+r#!/bin/bash
 
 function criticalError {
 
@@ -7,7 +7,7 @@ function criticalError {
 
 function getSample {
 
-        wget --timeout=20 --tries=5 --retry-connrefused -qO /dev/null 'http://spgdss-prod1-tag-11.maxtrad.rbsgrp.net:646/dss/doc/?g&j=80551000000032219&a=test1&s=test1abc'
+        wget --timeout=20 --tries=5 --retry-connrefused -qO /dev/null 'http://servername:646/dss/doc/?g&j=80551000000032219&a=test1&s=test1abc'
 }
 
 function restartDSS {
